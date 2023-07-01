@@ -70,13 +70,22 @@ if [[ ! $EXAMPLE_CLASS == org.apache.spark.examples* ]]; then
 fi
 
 exec "${SPARK_HOME}"/bin/spark-submit \
-  --master $EXAMPLE_MASTER \
+  --master yarn \
   --class $EXAMPLE_CLASS \
-  --deploy-mode client \
+  --deploy-mode cluster \
+  --conf spark.locality.wait=0s \
   --conf spark.ui.showConsoleProgress=false \
-  --conf spark.driver.maxResultSize=300g \
-  --conf spark.driver.memory=300g \
-  --conf spark.executor.memory=300g \
+  --conf spark.datalog.shuffledistinct.enabled=false \
+  --conf spark.driver.maxResultSize=7g \
+  --conf spark.driver.memory=7g \
+  --conf spark.executor.cores=3 \
+  --conf spark.dynamicAllocation.enabled=true \
+  --conf spark.executor.instances=12 \
+  --conf spark.datalog.recursion.maxIterations=1000000 \
+  --conf spark.executor.memory=7g \
   --conf spark.sql.shuffle.partitions=1 \
+  --conf spark.sql.shuffle.partitions=10 \
+  --conf spark.hadoop.fs.overwrite.files=true \
+  --conf mapreduce.job.complete.cancel.delegation.tokens=false \
   "$SPARK_EXAMPLES_JAR" \
   "$@"

@@ -67,6 +67,10 @@ object Experiments {
       sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
 
     val sc = new SparkContext(sparkConf)
+    val rawProgram = new StringBuilder
+    val fileContent = sc.textFile(filePath)
+    fileContent.collect().foreach(line => rawProgram.append(line))
+    println(rawProgram)
 
     if (options.contains("checkpointdir"))
       sc.setCheckpointDir(options("checkpointdir"))
@@ -144,11 +148,24 @@ object Experiments {
       case 99 => {
         // example input:
         // program=99 file=test.deal queryform=prg(A) baserelation_name1=arc.txt baserelation_name2=name2.txt generator=1
+        if (!options.contains("output"))
+          throw new IllegalArgumentException("Invalid argument - no output path provided")
+        val outputPath: String = options("output")
         val inputFilePath = options("file")
         val queryForm = options("queryform")
         val baseRelationFilePaths = options.filter(p => p._1.startsWith("baserelation_")).map(x => (x._1.substring(x._1.indexOf("_") + 1), x._2))
-        val result = runAdHoc(bigDatalogCtx, inputFilePath, queryForm, baseRelationFilePaths, options)
-        println("execution time: " + (System.currentTimeMillis() - start) + " ms, " + options("queryform") + " size: " + result.count())
+        val result = runAdHoc(bigDatalogCtx, rawProgram.toString(), queryForm, baseRelationFilePaths, options)
+        result.foreach(_ => ())
+        val count = result.count()
+        val executionTime = (System.currentTimeMillis() - start)
+        println("execution time: " + executionTime + " ms, " + options("queryform") + " size: " + count)        
+        if (outputPath.endsWith(".nt"))
+          result.map(row => s"${row.getString(0)} ${row.getString(1)} ${row.getString(2)} .").saveAsTextFile(outputPath)
+        else
+          result.saveAsTextFile(outputPath)
+        val summaryStr = s"Execution time: $executionTime ms, Query form: ${options("queryform")}, Result size: $count"
+        val summaryStrRDD = sc.parallelize(Seq(summaryStr))
+        summaryStrRDD.saveAsTextFile(outputPath + "-summary")
       }
     }
 
@@ -288,18 +305,15 @@ object Experiments {
   }
 
   def runAdHoc(bigDatalogCtx: BigDatalogContext,
-               filePath: String,
+               rawProgram: String,
                queryForm: String,
                baseRelationFilePaths: Map[String, String],
                options: Map[String, String]): RDD[Row] = {
-    val rawProgram = new StringBuilder
-    Files.readAllLines(Paths.get(filePath))
-      .toArray()
-      .foreach(line => rawProgram.append(line))
-
+        
     var result: RDD[Row] = null
+    
 
-    if (bigDatalogCtx.loadDatalogFile(rawProgram.toString())) {
+    if (bigDatalogCtx.loadProgram(rawProgram.toString())) {
       for (baseRelationFilePath <- baseRelationFilePaths)
         bigDatalogCtx.registerAndLoadTable(baseRelationFilePath._1, baseRelationFilePath._2, bigDatalogCtx.conf.numShufflePartitions)
 

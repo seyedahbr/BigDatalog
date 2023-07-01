@@ -90,7 +90,14 @@ object Utilities {
 
     assert(numPartitions > 0)
 
-    val delimiter = if (filePath.endsWith(".csv")) "," else "\t"
+    //val delimiter = if (filePath.endsWith(".csv")) "," else "\t"
+    val ext = filePath.split("\\.").last
+    val delimiter = ext match {
+      case "csv" => ','
+      case "tsv" => '\t'
+      case "nt" => ' '
+      case _ => throw new UnsupportedOperationException(s"File extension is: $ext. Expected csv|tsv|nt")
+    }
     val arity = schema.length
     val fs: Array[(String => Any)] = schema.map(s => createStringColumnConverter(s.dataType)).toArray
 

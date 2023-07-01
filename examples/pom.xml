@@ -36,6 +36,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>DeALS</groupId>
+      <artifactId>DeALS</artifactId>
+      <version>0.6</version>
+    </dependency>	  
+    <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-core_${scala.binary.version}</artifactId>
       <version>${project.version}</version>
