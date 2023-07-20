@@ -1,0 +1,10 @@
+database({
+  triple(X:integer, Y:integer, Z:integer)
+}).
+
+acceptable(X) <- triple(X,-840342212,-193471730).
+acceptable(X) <- triple(X,-840342212,-193471730).
+acceptable(X) <- triple(X,-840342212,-192580976).
+acceptable(X) <- triple(X,-840342212,-1874640056).
+acceptable(X) <- triple(X,-840342212,-1873720286).
+output(X,Y,Z) <- triple(X,Y,Z), acceptable(X).

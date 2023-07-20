@@ -1,0 +1,2 @@
+database({ arcs(X:string, Y:string) }).
+tc(X,Y) <- arcs(X,Y).

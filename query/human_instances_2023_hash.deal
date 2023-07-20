@@ -1,0 +1,6 @@
+database({
+  triple(X:integer, Y:integer, Z:integer)
+}).
+
+human(X) <- triple(X,Y,Z),Y=-840342212,Z=654236736.
+

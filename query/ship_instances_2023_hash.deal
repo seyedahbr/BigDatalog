@@ -1,0 +1,6 @@
+database({
+  triple(X:integer, Y:integer, Z:integer)
+}).
+
+ship(X) <- triple(X,-840342212,-1874553473).
+

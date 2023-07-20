@@ -1,0 +1,9 @@
+database({
+  triple(X:integer, Y:integer, Z:integer)
+}).
+
+isGeneClass(B) <- triple(B,-280828914,-193471730).
+isGeneClass(B) <- triple(B,-280828914,-193471730).
+isGeneClass(C) <- triple(C,-280828914,Y), isGeneClass(Y).
+acceptable(X) <- triple(X,-840342212,-193471730).
+acceptable(X) <- triple(X,-840342212,Z), isGeneClass(Z).
