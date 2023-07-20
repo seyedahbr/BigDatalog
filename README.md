@@ -1,5 +1,13 @@
 # BigDatalog on Spark 1.6.1 
 
+## Run Subsetting Queries
+For example, to get the instances of ships:
+
+```
+./bin/run-example-yarn datalog.Experiments --program=99 --file=query/ship_instances_2015.deal --queryform="ship(A)" --baserelation_triple=wikidata-ntriple-dump.nt --output=ships.output
+
+```
+
 BigDatalog is a Datalog system for Big Data Analytics first presented at SIGMOD 2016.  See the paper [Big Data Analytics with Datalog Queries on Spark](http://yellowstone.cs.ucla.edu/~yang/paper/sigmod2016-p958.pdf) for details.
 
 BigDatalog is implemented as a module (datalog) in Spark that requires a few changes to the core and sql modules.  Building, configuring and running examples follows the normal Spark approach which you can read about under [here] (http://spark.apache.org/docs/1.6.1/). 
